@@ -1,4 +1,4 @@
-*The statement written after `//` are comments.
+*The statements written after `//` are comments.
 //the code chunks for defining different methods/functions are below the main chunk. 
 
 import java.util.Scanner;
