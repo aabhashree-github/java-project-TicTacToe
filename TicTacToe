@@ -1,0 +1,264 @@
+*The statement written after `//` are comments.
+//the code chunks for defining different methods/functions are below the main chunk. 
+
+import java.util.Scanner;
+import java.util.Random;
+import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+
+class Main {
+
+  static ArrayList<Integer> player1Positions = new ArrayList<Integer>(); //an array list that stores player 1 positions
+  static ArrayList<Integer> player2Positions = new ArrayList<Integer>(); //an array list that stores player 2 positions
+
+  public static void main(String[] args) {
+    //creating the game board
+    char[] [] gameBoard = {{' ', '|', ' ', '|', ' '},
+    {'-', '-', '-', '-', '-'},
+    {' ', '|', ' ', '|', ' '},
+    {'-', '-', '-', '-', '-'},
+    {' ', '|', ' ', '|', ' '}};
+    
+    System.out.printf("%n---Welcome to TicTacToe!---%n");
+    Scanner sc = new Scanner(System.in);    
+    System.out.printf("If you want to play against the computer, select 1%nIf you want to proceed with a 2-human players, select 2:"); //input prompt that asks for the number of players
+    int numPlayers = sc.nextInt();
+    
+    if (numPlayers == 1) {
+      
+      System.out.printf("%nYou are Player 1. The computer is Player 2.%n");
+      printGameBoard(gameBoard);
+      
+      while(true) {
+        
+        int humanPos = player1checkInput();
+
+        //to check if the input is greater than the available number of spots
+        while (humanPos > 8) {
+          System.out.println("Your input is greater than the number of positions available. Please input a number less or equal to 8!");
+          humanPos = player1checkInput();
+        }   
+      
+        //check whether the spot is already taken
+        while (player1Positions.contains(humanPos) || player2Positions.contains(humanPos)) {
+          System.out.println("Spot taken! Enter another position:");
+          humanPos = player1checkInput();
+        }
+
+        placeSymbol(gameBoard, humanPos, "Player 1"); 
+
+        String result  = checkWinner();//checks the status of the game board to derive the result
+        if (result.length() > 0) {
+          System.out.println(result);
+          break;
+        }
+
+        Random rand = new Random();//to generate the move for the computer if the computer is player 2
+        int compPos = rand.nextInt(8) + 0;
+        //check whether the spot is already taken
+        while (player1Positions.contains(compPos) || player2Positions.contains(compPos)) {
+          compPos = rand.nextInt(8) + 0;
+        }
+
+        placeSymbol(gameBoard, compPos, "Player 2");       
+    
+        printGameBoard(gameBoard);
+
+        result  = checkWinner();//checks the status of the game board to derive the result
+        if (result.length() > 0) {
+          System.out.println(result);
+          break;
+        }          
+      }
+      printGameBoard(gameBoard);
+    }
+    //if two-player game is selected
+    else if (numPlayers == 2) {
+
+      printGameBoard(gameBoard);
+
+      while(true) {
+        
+        int player1 = player1checkInput();
+
+        while (player1 > 8) {
+          System.out.println("Your input is greater than the number of positions available. Please input a number less or equal to 8!");
+          player1 = player1checkInput();
+        }  
+      
+        while (player1Positions.contains(player1) || player2Positions.contains(player1)) {
+          System.out.println("Player 1: Spot taken! Enter another position:");
+          player1 = player1checkInput();
+        }
+
+        placeSymbol(gameBoard, player1, "Player 1");
+
+        printGameBoard(gameBoard);
+
+        String result  = checkWinner();
+        if (result.length() > 0) {
+          System.out.println(result);
+          break;
+        }
+
+        int player2 = player2checkInput();
+
+        while (player2 > 8){
+          System.out.println("Your input is greater than the number of positions available. Please input a number less or equal to 8!");
+          player2 = player2checkInput();
+        }   
+        
+        while (player1Positions.contains(player2) || player2Positions.contains(player2)) {
+          System.out.println("Player 2: Spot taken! Enter another position:");
+          player2 = player2checkInput();
+        }
+        
+        placeSymbol(gameBoard, player2, "Player 2");
+
+        printGameBoard(gameBoard);
+
+        result  = checkWinner();
+        if (result.length() > 0) {
+          System.out.println(result);
+          break;
+        }     
+      }
+      printGameBoard(gameBoard);
+    } 
+            
+  }
+
+  //method to print the gameboard
+  public static void printGameBoard (char[][] gameBoard) {
+    for (char[] row : gameBoard) {
+      for (char c : row) {
+        System.out.print(c);
+      }
+      System.out.println();      
+    }         
+  }
+
+  //method to place symbol on the gameboard as well as add positions to the array which stores positions for players
+  public static void placeSymbol(char[][] gameBoard, int position, String user) {
+    char symbol = ' ';
+
+    if(user.equals("Player 1")) {
+      symbol = 'X';
+      player1Positions.add(position);
+    }
+    else if (user.equals("Player 2")) {
+      symbol = 'O';
+      player2Positions.add(position);
+    }
+
+    switch(position) {
+      case 0:
+      gameBoard[0][0] = symbol;
+      break;
+      case 1:
+      gameBoard[0][2] = symbol;
+      break;
+      case 2:
+      gameBoard[0][4] = symbol;
+      break;
+      case 3:
+      gameBoard[2][0] = symbol;
+      break;
+      case 4:
+      gameBoard[2][2] = symbol;
+      break;
+      case 5:
+      gameBoard[2][4] = symbol;
+      break;
+      case 6:
+      gameBoard[4][0] = symbol;
+      break;
+      case 7:
+      gameBoard[4][2] = symbol;
+      break;
+      case 8:
+      gameBoard[4][4] = symbol;
+      break; 
+      default:
+      break;
+    }
+  }
+
+  //method to check the winner by checking every possibility of a win
+  public static String checkWinner() {
+    List topRow = Arrays.asList(0, 1, 2);
+    List middleRow = Arrays.asList(3, 4, 5);
+    List bottomRow = Arrays.asList(6, 7, 8);
+    List leftCol = Arrays.asList(0, 3,6);
+    List midCol = Arrays.asList(1, 4, 7);
+    List rightCol = Arrays.asList(2, 5, 8);
+    List Diagonal1 = Arrays.asList(0, 4, 8);
+    List Diagonal2 = Arrays.asList(2, 4, 6);
+
+    List<List> winner = new ArrayList<List>();//creating an array list of winning possibilities
+    winner.add(topRow);
+    winner.add(middleRow);
+    winner.add(bottomRow);
+    winner.add(leftCol);
+    winner.add(midCol);
+    winner.add(rightCol);
+    winner.add(Diagonal1);
+    winner.add(Diagonal2);
+
+    //looping over the list of winning possibilities and checking each player's position list for a winning possibility to decide who won
+    for(List l : winner) {
+      if (player1Positions.containsAll(l)) {
+        return "Player 1 wins!";
+      }
+      else if (player2Positions.containsAll(l)) {
+        return "Player 2 wins!";
+      }
+      else if (player1Positions.size() + player2Positions.size() == 9) {
+        return "Draw!";
+      }
+    }
+    return "";
+  }
+
+  //method to check the validity of player 1's input and handle execptions
+  public static int player1checkInput() {
+    int number;
+    Scanner num = new Scanner(System.in);
+    while (true) {
+      try {
+       // Reading in a number
+        System.out.println("Player 1 : Enter a number 0-8:");
+        number = num.nextInt();          
+        
+        break;
+      } 
+      catch (InputMismatchException error) {
+        System.out.printf("Invalid input!!! Please enter numbers only from 0-8 !%n");
+        num.next(); // skip bad token
+      }
+    }
+    return number;      
+  }
+
+  // method to check the validity of player 2's input and handle execptions
+  public static int player2checkInput() {
+    int number;
+    Scanner num1 = new Scanner(System.in);
+    while (true) {
+      try {
+       // Reading in a number
+        System.out.println("Player 2 : Enter a number 0-8:");
+        number = num1.nextInt();          
+        
+        break;
+      } 
+      catch (InputMismatchException error) {
+        System.out.printf("Invalid input!!! Please enter numbers only from 0-8 !%n");
+        num1.next(); // skip bad token
+      }
+    }
+    return number;      
+  }
+}
